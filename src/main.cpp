@@ -127,6 +127,32 @@ void setup() {
 }
 
 void loop() {
+  BLEScan *scan = BLEDevice::getScan();
+  scan->setActiveScan(true);
+  BLEScanResults results = scan->start(1);
+  int best = -100;
+  for (int i = 0; i < results.getCount(); i++) {
+    BLEAdvertisedDevice device = results.getDevice(i);
+    int rssi = device.getRSSI();
+    Serial.println(rssi);
+    delay(500);
+    String nam=device.getAddress().toString().c_str();
+    Serial.println(nam);
+    delay(1000);
+    // String dev="ac:23:3f:a1:79:3d";
+    // if(nam==dev)
+    // {
+    //   Serial.println("rssi=" + rssi);
+    // }
+
+    // if (rssi > best) {
+    //   best = rssi;
+    // }
+
+    //Serial.println(nam);
+    
+
+  }
   if (deviceConnected) {
     // Fabricate some arbitrary junk for now...
     txValue = 10 / 3.456; // This could be an actual sensor reading!
