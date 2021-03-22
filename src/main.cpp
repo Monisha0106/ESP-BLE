@@ -136,14 +136,19 @@ void loop() {
     int rssi = device.getRSSI();
     Serial.println(rssi);
     delay(500);
-    String nam=device.getAddress().toString().c_str();
+    String nam="";
+    nam += device.getAddress().toString().c_str();
     Serial.println(nam);
     delay(1000);
-    // String dev="ac:23:3f:a1:79:3d";
-    // if(nam==dev)
-    // {
-    //   Serial.println("rssi=" + rssi);
-    // }
+    String dev="ac:23:3f:a1:79:3d";
+    if(nam==dev)
+    {
+      Serial.println("rssi=" + rssi);
+    }
+    else if(nam == "")
+    {
+      Serial.println("Absent");
+    }
 
     // if (rssi > best) {
     //   best = rssi;
