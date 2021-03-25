@@ -31,11 +31,12 @@
 const char *ssid =  "dma-gulshan5.0";   // name of your WiFi network
 const char *password =  "dmabd987"; // password of the WiFi network
 const char *mqtt_server = "broker.hivemq.com";
-// IPAddress broker(192,168,1,-); // IP address of your MQTT broker eg. 192.168.1.50
+IPAddress broker(127,0,0,1); // IP address of your MQTT broker eg. 192.168.1.50
 WiFiClient wclient;
 
 PubSubClient client(wclient); // Setup MQTT client
 bool state=0;
+
 unsigned long lastMsg = 0;
 #define MSG_BUFFER_SIZE	(50)
 char msg[MSG_BUFFER_SIZE];
@@ -143,7 +144,7 @@ void reconnect() {
       // Once connected, publish an announcement...
       client.publish("ble1", "hello world");
       // ... and resubscribe
-      client.subscribe("inTopic");
+      // client.subscribe("inTopic");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
