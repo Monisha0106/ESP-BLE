@@ -31,7 +31,14 @@ bool deviceConnected = false;
 float txValue = 0;
 const int readPin = 32; // Use GPIO number. See ESP32 board pinouts
 const int Gate = 2; // Could be different depending on the dev board. I used the DOIT ESP32 dev board.
+String dev[12]={"ac:23:3f:a1:79:3e","ac:23:3f:a1:79:3d","ac:23:3f:a1:7b:07","d8:e0:e1:0a:9e:82","dd:33:0a:01:96:42", "03:e8:0a:05:8a:01" , "40:73:58:6a:f2:a5", "62:09:7a:64:a1:de",
+"6e:ce:26:f4:ba:1e",
+"6f:ef:c8:15:a6:b0",
+"ac:23:3f:a1:79:49",
 
+"ac:23:3f:a1:7a:75"};
+
+bool dev_status[12];
 //std::string rxValue; // Could also make this a global var to access it in loop()
 
 // See the following for generating UUIDs:
@@ -69,19 +76,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
           EEPROM.put(address,employee);
           Serial.print(rxValue[i]);
         }
-
         Serial.println();
-
-        // Do stuff based on the command received from the app
-        // if (rxValue.find("A") != -1) { 
-        //   Serial.print("Turning ON!");
-        //   digitalWrite(Gate, HIGH);
-        // }
-        // else if (rxValue.find("B") != -1) {
-        //   Serial.print("Turning OFF!");
-        //   digitalWrite(Gate, LOW);
-        // }
-
         Serial.println();
         Serial.println("*********");
       }
@@ -131,28 +126,42 @@ void loop() {
   scan->setActiveScan(true);
   BLEScanResults results = scan->start(1);
   int best = -100;
-  for (int i = 0; i < results.getCount(); i++) {
+  for (int i = 0; i < results.getCount(); i++) 
+  {
     BLEAdvertisedDevice device = results.getDevice(i);
-    int rssi = device.getRSSI();
-    Serial.println(rssi);
-    delay(500);
+     int rssi = device.getRSSI();
+    // Serial.println(rssi);
+    // delay(500);
     String nam=device.getAddress().toString().c_str();
-    Serial.println(nam);
-    delay(1000);
-    // String dev="ac:23:3f:a1:79:3d";
-    // if(nam==dev)
-    // {
-    //   Serial.println("rssi=" + rssi);
-    // }
-
-    // if (rssi > best) {
-    //   best = rssi;
-    // }
-
-    //Serial.println(nam);
-    
+    // Serial.println(nam);
+    delay(1000); 
+    for(int i = 0; i < 3; i ++)
+    {
+      if(nam == dev[i])
+      { 
+        // Serial.println(nam);
+        dev_status[i] = 1; 
+      }
+    }
 
   }
+   Serial.println("New Status");
+  for(int i = 0; i < 3; i++)
+    {
+      // Serial.println(dev_status[i]);
+      if(dev_status[i])
+      {
+        Serial.println(dev[i]+" is present");
+        dev_status[i] = 0;
+      }
+      else
+      {
+        Serial.println(dev[i]+" is absent");
+        
+      }
+    }
+  delay(2000);
+
   if (deviceConnected) {
     // Fabricate some arbitrary junk for now...
     txValue = 10 / 3.456; // This could be an actual sensor reading!
@@ -165,10 +174,10 @@ void loop() {
 //    pCharacteristic->setValue("Hello!"); // Sending a test message
     pCharacteristic->setValue(txString);
     
-    pCharacteristic->notify(); // Send the value to the app!
-    Serial.print("*** Sent Value: ");
-    Serial.print(txString);
-    Serial.println(" ***");
+    pCharacteristic->notify();} // Send the value to the app!
+    // Serial.print("*** Sent Value: ");
+    // Serial.print(txString);
+    // Serial.println(" ***");
 
     // You can add the rxValue checks down here instead
     // if you set "rxValue" as a global var at the top!
@@ -181,7 +190,6 @@ void loop() {
 //    else if (rxValue.find("B") != -1) {
 //      Serial.println("Turning OFF!");
 //      digitalWrite(LED, LOW);
-//    }
-  }
-  delay(1000);
+   
+  // delay(1000);
 }
