@@ -31,14 +31,12 @@ bool deviceConnected = false;
 float txValue = 0;
 const int readPin = 32; // Use GPIO number. See ESP32 board pinouts
 const int Gate = 2; // Could be different depending on the dev board. I used the DOIT ESP32 dev board.
-String dev[12]={"ac:23:3f:a1:79:3e","ac:23:3f:a1:79:3d","d8:e0:e1:0a:9e:82","dd:33:0a:01:96:42", "03:e8:0a:05:8a:01" , "40:73:58:6a:f2:a5", "62:09:7a:64:a1:de",
+String dev[12]={"ac:23:3f:a1:79:3e","ac:23:3f:a1:79:3d","ac:23:3f:a1:7b:07","d8:e0:e1:0a:9e:82","dd:33:0a:01:96:42", "03:e8:0a:05:8a:01" , "40:73:58:6a:f2:a5", "62:09:7a:64:a1:de",
 "6e:ce:26:f4:ba:1e",
 "6f:ef:c8:15:a6:b0",
 "ac:23:3f:a1:79:49",
 
-"ac:23:3f:a1:7a:75",
-
-"ac:23:3f:a1:7b:07"};
+"ac:23:3f:a1:7a:75"};
 
 bool dev_status[12];
 //std::string rxValue; // Could also make this a global var to access it in loop()
@@ -137,18 +135,18 @@ void loop() {
     String nam=device.getAddress().toString().c_str();
     // Serial.println(nam);
     delay(1000); 
-    for(int i = 0; i < 2; i ++)
+    for(int i = 0; i < 3; i ++)
     {
       if(nam == dev[i])
       { 
         // Serial.println(nam);
-        dev_status[i] = 1;
+        dev_status[i] = 1; 
       }
     }
 
   }
-
-  for(int i = 0; i < 2; i++)
+   Serial.println("New Status");
+  for(int i = 0; i < 3; i++)
     {
       // Serial.println(dev_status[i]);
       if(dev_status[i])
