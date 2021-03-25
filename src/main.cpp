@@ -24,7 +24,19 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-#include<EEPROM.h>
+#include <EEPROM.h>
+#include <WiFi.h>
+#include <PubSubClient.h>
+
+const char *ssid =  "dma-gulshan5.0";   // name of your WiFi network
+const char *password =  "dmabd987"; // password of the WiFi network
+
+IPAddress broker(192,168,1,-); // IP address of your MQTT broker eg. 192.168.1.50
+WiFiClient wclient;
+
+PubSubClient client(wclient); // Setup MQTT client
+bool state=0;
+
 int address=0;
 BLECharacteristic *pCharacteristic;
 bool deviceConnected = false;
@@ -87,6 +99,43 @@ class MyCallbacks: public BLECharacteristicCallbacks {
       }
     }
 };
+
+void setup_wifi() {
+  Serial.print("\nConnecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password); // Connect to network
+
+  while (WiFi.status() != WL_CONNECTED) { // Wait for connection
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println();
+  Serial.println("WiFi connected");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+// Reconnect to client
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect(ID)) {
+      Serial.println("connected");
+      Serial.print("Publishing to: ");
+      Serial.println(TOPIC);
+      Serial.println('\n');
+
+    } else {
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
 
 void setup() {
   Serial.begin(9600);
