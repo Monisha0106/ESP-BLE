@@ -25,6 +25,11 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include<EEPROM.h>
+#include<WiFi.h>
+
+const char* SSID = "Audhru_2.4";
+const char* Password = "11235813";
+
 int address=0;
 BLECharacteristic *pCharacteristic;
 bool deviceConnected = false;
@@ -37,6 +42,7 @@ String dev[12]={"ac:23:3f:a1:79:3e","ac:23:3f:a1:79:3d","ac:23:3f:a1:7b:07","d8:
 "ac:23:3f:a1:79:49",
 
 "ac:23:3f:a1:7a:75"};
+// String dev[2] = {"ac:23:3f:a1:79:3d", "ac:23:3f:a1:7b:07"};
 
 bool dev_status[12];
 //std::string rxValue; // Could also make this a global var to access it in loop()
@@ -83,8 +89,27 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     }
 };
 
+void ConnectToWiFi()
+{
+ 
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(SSID, Password);
+  Serial.print("Connecting to "); Serial.println(SSID);
+ 
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print('.');
+    delay(500);
+  }
+ 
+  Serial.print(F("Connected. My IP address is: "));
+  Serial.println(WiFi.localIP());
+}
+
 void setup() {
   Serial.begin(9600);
+
+  ConnectToWiFi();
 
   pinMode(Gate, OUTPUT);
 
