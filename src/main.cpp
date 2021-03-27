@@ -25,10 +25,13 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include<EEPROM.h>
-#include<WiFi.h>
+#include "ESP32_MQTT.h"
 
-const char* SSID = "Audhru_2.4";
-const char* Password = "11235813";
+ESP32_MQTT esp_mqtt;
+// #include<WiFi.h>
+
+// const char* SSID = "Audhru_2.4";
+// const char* Password = "11235813";
 
 int address=0;
 BLECharacteristic *pCharacteristic;
@@ -89,27 +92,35 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     }
 };
 
-void ConnectToWiFi()
-{
+// void ConnectToWiFi()
+// {
  
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(SSID, Password);
-  Serial.print("Connecting to "); Serial.println(SSID);
+//   WiFi.mode(WIFI_STA);
+//   WiFi.begin(SSID, Password);
+//   Serial.print("Connecting to "); Serial.println(SSID);
  
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    Serial.print('.');
-    delay(500);
-  }
+//   while (WiFi.status() != WL_CONNECTED)
+//   {
+//     Serial.print('.');
+//     delay(500);
+//   }
  
-  Serial.print(F("Connected. My IP address is: "));
-  Serial.println(WiFi.localIP());
-}
+//   Serial.print(F("Connected. My IP address is: "));
+//   Serial.println(WiFi.localIP());
+// }
 
 void setup() {
   Serial.begin(9600);
 
-  ConnectToWiFi();
+  esp_mqtt.get_WiFi_SSID("Audhru_2.4");
+  esp_mqtt.get_WiFi_Password("11235813");
+  // esp_mqtt.get_WiFi_Credentials("ESP32", "12345678", "192.168.1.1", "AP");
+  delay(2000);
+  esp_mqtt.setup_wifi();
+  delay(5000);
+  // esp_mqtt.get_Static_IP("192.168.0.100");
+
+  // ConnectToWiFi();
 
   pinMode(Gate, OUTPUT);
 
