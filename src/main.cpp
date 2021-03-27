@@ -33,7 +33,7 @@ const char* Password = "11235813";
 
 #include "BLE.h"
 
-BLE myBLE;
+BLE *myBLE;
 
 // int address=0;
 // BLECharacteristic *pCharacteristic;
@@ -113,11 +113,15 @@ void ConnectToWiFi()
 
 void setup() {
   Serial.begin(9600);
-
-  // ConnectToWiFi();
-  myBLE.init();
-  myBLE.Start();
-  myBLE.Start_Advertising();
+  delay(5000);
+  Serial.println("Starting ESP");
+  ConnectToWiFi();
+  // myBLE->init();
+  // myBLE->Start();
+  // myBLE->Start_Advertising();
+  // myBLE.init();
+  // myBLE.Start();
+  // myBLE.Start_Advertising();
 
   // pinMode(Gate, OUTPUT);
 
@@ -159,8 +163,8 @@ void setup() {
 
 void loop() 
 {
-  myBLE.Scan();
-  Serial.println(myBLE.number_of_connected_devices);
+  // myBLE.Scan();
+  // Serial.println(myBLE.number_of_connected_devices);
 }
 /*
   BLEScan *scan = BLEDevice::getScan();
