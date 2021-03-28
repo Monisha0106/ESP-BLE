@@ -20,74 +20,79 @@
    And txValue is the data to be sent, in this example just a byte incremented every second. 
 */
 #include<Arduino.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <BLEUtils.h>
-#include <BLE2902.h>
-#include<EEPROM.h>
+// #include <BLEDevice.h>
+// #include <BLEServer.h>
+// #include <BLEUtils.h>
+// #include <BLE2902.h>
+// #include<EEPROM.h>
 #include<WiFi.h>
+
 
 const char* SSID = "Audhru_2.4";
 const char* Password = "11235813";
 
-int address=0;
-BLECharacteristic *pCharacteristic;
-bool deviceConnected = false;
-float txValue = 0;
-const int readPin = 32; // Use GPIO number. See ESP32 board pinouts
-const int Gate = 2; // Could be different depending on the dev board. I used the DOIT ESP32 dev board.
-String dev[12]={"ac:23:3f:a1:79:3e","ac:23:3f:a1:79:3d","ac:23:3f:a1:7b:07","d8:e0:e1:0a:9e:82","dd:33:0a:01:96:42", "03:e8:0a:05:8a:01" , "40:73:58:6a:f2:a5", "62:09:7a:64:a1:de",
-"6e:ce:26:f4:ba:1e",
-"6f:ef:c8:15:a6:b0",
-"ac:23:3f:a1:79:49",
+#include "BLE.h"
 
-"ac:23:3f:a1:7a:75"};
-// String dev[2] = {"ac:23:3f:a1:79:3d", "ac:23:3f:a1:7b:07"};
+BLE *myBLE;
 
-bool dev_status[12];
-//std::string rxValue; // Could also make this a global var to access it in loop()
+// int address=0;
+// BLECharacteristic *pCharacteristic;
+// bool deviceConnected = false;
+// float txValue = 0;
+// const int readPin = 32; // Use GPIO number. See ESP32 board pinouts
+// const int Gate = 2; // Could be different depending on the dev board. I used the DOIT ESP32 dev board.
+// String dev[12]={"ac:23:3f:a1:79:3e","ac:23:3f:a1:79:3d","ac:23:3f:a1:7b:07","d8:e0:e1:0a:9e:82","dd:33:0a:01:96:42", "03:e8:0a:05:8a:01" , "40:73:58:6a:f2:a5", "62:09:7a:64:a1:de",
+// "6e:ce:26:f4:ba:1e",
+// "6f:ef:c8:15:a6:b0",
+// "ac:23:3f:a1:79:49",
 
-// See the following for generating UUIDs:
-// https://www.uuidgenerator.net/
+// "ac:23:3f:a1:7a:75"};
+// // String dev[2] = {"ac:23:3f:a1:79:3d", "ac:23:3f:a1:7b:07"};
 
-#define SERVICE_UUID           "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" // UART service UUID
-#define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
-#define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+// bool dev_status[12];
+// //std::string rxValue; // Could also make this a global var to access it in loop()
 
-class MyServerCallbacks: public BLEServerCallbacks {
-    void onConnect(BLEServer* pServer) {
-      deviceConnected = true;
-    };
+// // See the following for generating UUIDs:
+// // https://www.uuidgenerator.net/
 
-    void onDisconnect(BLEServer* pServer) {
-      deviceConnected = false;
-    }
-};
-struct ID{
-  std::string id[10];
-};
-struct ID employee;
-int count=0;
-class MyCallbacks: public BLECharacteristicCallbacks {
-    void onWrite(BLECharacteristic *pCharacteristic) {
-      std::string rxValue = pCharacteristic->getValue();
+// #define SERVICE_UUID           "6E400001-B5A3-F393-E0A9-E50E24DCCA9E" // UART service UUID
+// #define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+// #define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
-      if (rxValue.length() > 0) {
-         employee.id[count]=rxValue;
-         count++;
-        Serial.println("*********");
-        Serial.print("Received Value: ");
+// class MyServerCallbacks: public BLEServerCallbacks {
+//     void onConnect(BLEServer* pServer) {
+//       deviceConnected = true;
+//     };
 
-        for (int i = 0; i < rxValue.length(); i++) {
-          EEPROM.put(address,employee);
-          Serial.print(rxValue[i]);
-        }
-        Serial.println();
-        Serial.println();
-        Serial.println("*********");
-      }
-    }
-};
+//     void onDisconnect(BLEServer* pServer) {
+//       deviceConnected = false;
+//     }
+// };
+// struct ID{
+//   std::string id[10];
+// };
+// struct ID employee;
+// int count=0;
+// class MyCallbacks: public BLECharacteristicCallbacks {
+//     void onWrite(BLECharacteristic *pCharacteristic) {
+//       std::string rxValue = pCharacteristic->getValue();
+
+//       if (rxValue.length() > 0) {
+//          employee.id[count]=rxValue;
+//          count++;
+//         Serial.println("*********");
+//         Serial.print("Received Value: ");
+
+//         for (int i = 0; i < rxValue.length(); i++) {
+//           EEPROM.put(address,employee);
+//           Serial.print(rxValue[i]);
+//         }
+//         Serial.println();
+//         Serial.println();
+//         Serial.println("*********");
+//       }
+//     }
+// };
 
 void ConnectToWiFi()
 {
@@ -108,11 +113,20 @@ void ConnectToWiFi()
 
 void setup() {
   Serial.begin(9600);
-
+  delay(5000);
+  Serial.println("Starting ESP");
   ConnectToWiFi();
+  // myBLE->init();
+  // myBLE->Start();
+  // myBLE->Start_Advertising();
+  // myBLE.init();
+  // myBLE.Start();
+  // myBLE.Start_Advertising();
 
-  pinMode(Gate, OUTPUT);
+  // pinMode(Gate, OUTPUT);
 
+}
+/*
   // Create the BLE Device
   BLEDevice::init("Uttsha's BLE"); // Give it a name
 
@@ -145,8 +159,14 @@ void setup() {
   pServer->getAdvertising()->start();
   Serial.println("Waiting a client connection to notify...");
 }
+*/
 
-void loop() {
+void loop() 
+{
+  // myBLE.Scan();
+  // Serial.println(myBLE.number_of_connected_devices);
+}
+/*
   BLEScan *scan = BLEDevice::getScan();
   scan->setActiveScan(true);
   BLEScanResults results = scan->start(1);
@@ -218,3 +238,4 @@ void loop() {
    
   // delay(1000);
 }
+*/
