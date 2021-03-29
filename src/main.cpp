@@ -109,6 +109,9 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 //   Serial.println(WiFi.localIP());
 // }
 
+const char *sub_topic = "esp32/dhrubo_sub";
+const char *pub_topic = "esp32/dhrubo";
+
 void setup() {
   Serial.begin(9600);
 
@@ -118,10 +121,12 @@ void setup() {
   delay(2000);
   esp_mqtt.setup_wifi();
   delay(5000);
-  // esp_mqtt.get_Static_IP("192.168.0.100");
+  esp_mqtt.get_Broker_Address("broker.hivemq.com");
+  esp_mqtt.get_Broker_Port(1883);
+  esp_mqtt.set_Server_And_Callback();
 
-  // ConnectToWiFi();
-
+  esp_mqtt.get_Sub_Topic(sub_topic);
+  esp_mqtt.Subscribe(sub_topic);
   pinMode(Gate, OUTPUT);
 
   // Create the BLE Device
@@ -158,6 +163,13 @@ void setup() {
 }
 
 void loop() {
+  if(!esp_mqtt.is_MQTT_Connected())
+  {
+    esp_mqtt.MQTT_Reconnect();
+  }
+  esp_mqtt.loop();
+  esp_mqtt.Publish("esp32_workforce_management", "Hey Dhrubo");
+
   BLEScan *scan = BLEDevice::getScan();
   scan->setActiveScan(true);
   BLEScanResults results = scan->start(1);
