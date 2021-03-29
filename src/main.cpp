@@ -168,7 +168,7 @@ void loop() {
     esp_mqtt.MQTT_Reconnect();
   }
   esp_mqtt.loop();
-  esp_mqtt.Publish("esp32_workforce_management", "Hey Dhrubo");
+  esp_mqtt.Publish(pub_topic, "Hey Dhrubo");
 
   BLEScan *scan = BLEDevice::getScan();
   scan->setActiveScan(true);

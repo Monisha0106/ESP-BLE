@@ -154,7 +154,7 @@ void ESP32_MQTT::MQTT_Reconnect()
     {
         Serial.print("Attempting MQTT connection...");
         // Attempt to connect
-        if (client.connect("ESP8266Client")) 
+        if (client.connect("DMA_ESP32Client")) 
         {
             Serial.println("connected");
             // Subscribe
