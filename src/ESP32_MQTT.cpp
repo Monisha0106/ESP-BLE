@@ -101,3 +101,88 @@ void ESP32_MQTT::get_WiFi_Credentials(char* SSID, char* Password, String Static_
     }
     
 }
+
+
+void ESP32_MQTT::get_Broker_Address(char *broker)
+{
+    this->mqtt_broker = broker;
+}
+
+void ESP32_MQTT::get_Broker_Port(int Port)
+{
+    this->mqtt_port = Port;
+}
+
+void ESP32_MQTT::get_Sub_Topic(const char *Topic)
+{
+    this->sub_topic = Topic;
+}
+void ESP32_MQTT::get_Pub_Topic(const char *Topic)
+{
+    this->pub_topic = Topic;
+}
+
+void Callback(char* topic, byte* message, unsigned int length) 
+{
+    Serial.print("Message arrived on topic: ");
+    Serial.print(topic);
+    Serial.print(". Message: ");
+    String messageTemp;
+    
+    for (int i = 0; i < length; i++) 
+    {
+        Serial.print((char)message[i]);
+        messageTemp += (char)message[i];
+    }
+}
+
+void ESP32_MQTT::set_Server_And_Callback()
+{
+    client.setServer(this->mqtt_broker, this->mqtt_port);
+    client.setCallback(Callback);
+}
+
+bool ESP32_MQTT::is_MQTT_Connected()
+{
+    return client.connected();
+}
+
+void ESP32_MQTT::MQTT_Reconnect()
+{
+      // Loop until we're reconnected
+    while (!client.connected()) 
+    {
+        Serial.print("Attempting MQTT connection...");
+        // Attempt to connect
+        if (client.connect("DMA_ESP32Client")) 
+        {
+            Serial.println("connected");
+            // Subscribe
+            client.subscribe(this->sub_topic);
+        } 
+        
+        else 
+        {
+            Serial.print("failed, rc=");
+            Serial.print(client.state());
+            Serial.println(" try again in 5 seconds");
+            // Wait 5 seconds before retrying
+            delay(5000);
+        }
+  }
+}
+
+void ESP32_MQTT::Subscribe(const char *Topic)
+{
+    client.subscribe(Topic);
+}
+
+void ESP32_MQTT::Publish(const char *Topic, char *Payload)
+{
+    client.publish(Topic, Payload);
+}
+
+void ESP32_MQTT::loop()
+{
+    client.loop();
+}
