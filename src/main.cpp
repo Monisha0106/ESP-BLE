@@ -28,8 +28,8 @@
 #include<WiFi.h>
 
 
-const char* SSID = "Audhru_2.4";
-const char* Password = "11235813";
+const char* SSID = "Buchi";
+const char* Password = "buchic@t";
 
 #include "BLE.h"
 
@@ -116,9 +116,10 @@ void setup() {
   delay(5000);
   Serial.println("Starting ESP");
   ConnectToWiFi();
-  // myBLE->init();
-  // myBLE->Start();
-  // myBLE->Start_Advertising();
+  myBLE->init();
+  myBLE->Start();
+  myBLE->Start_Advertising();
+  Serial.println("End Setup");
   // myBLE.init();
   // myBLE.Start();
   // myBLE.Start_Advertising();
@@ -163,8 +164,11 @@ void setup() {
 
 void loop() 
 {
-  // myBLE.Scan();
-  // Serial.println(myBLE.number_of_connected_devices);
+  Serial.println("Hellooooooooo");
+  myBLE->Scan();
+  Serial.println("##############");
+  Serial.println(myBLE->number_of_connected_devices);
+  Serial.println("##############");
 }
 /*
   BLEScan *scan = BLEDevice::getScan();

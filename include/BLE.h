@@ -48,7 +48,7 @@ class BLE: public MyServerCallbacks, public MyCallbacks
     public:
         struct ID employee;
         uint32_t scan_duration;
-        uint number_of_connected_devices;
+        int number_of_connected_devices;
         BLEServer *pServer = BLEDevice::createServer();
         BLEService *pService = pServer->createService(SERVICE_UUID);
         BLECharacteristic *pCharacteristic;
